@@ -1,12 +1,13 @@
 Remove-Module posh-git -ErrorAction Ignore
-function prompt()
-{
-    "#KM404/>"
-}
-
+function prompt {"#PSHSummit\>"}
 # Remove loanDepot repository
 # Unregister-PSRepository DevOpsPowerShell
 
 .\Cleanup.ps1
 
-code .\Demo1.ps1
+
+. "C:\Program Files\Microsoft Office\root\Office16\POWERPNT.EXE" /s  .\ManagingModulesPresentation.pptx
+code .\PSHSummit.ps1
+
+break;
+

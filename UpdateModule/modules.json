@@ -1,0 +1,38 @@
+[
+  {
+    "Name":"DependsOn",
+    "Repository":"PSGallery",
+    "MaximumVersion":"1.99.99",
+    "MinimumVersion":"1.0.2.1"
+  },
+  {
+    "Name":"jira",
+    "Repository":"PSGallery",
+    "MaximumVersion":"0.99.99",
+    "MinimumVersion":"0.3.2"
+  },
+  {
+    "Name":"TFVC",
+    "Repository": "PSGallery",
+    "MaximumVersion":"0.99.99",
+    "MinimumVersion":"0.1.6"
+  },
+  {
+    "Name":"TFVC.libraries",
+    "Repository": "PSGallery",
+    "MaximumVersion":"0.99.99",
+    "MinimumVersion":"0.1.6"
+  },
+  {
+    "Name":"VsoLoggingCommands",
+    "Repository": "PSGallery",
+    "MaximumVersion":"0.99.99",
+    "MinimumVersion":"0.1.1"
+  },
+  {
+    "Name":"Watch-Command",
+    "Repository":"PSGallery",
+    "MaximumVersion":"0.99.99",
+    "MinimumVersion":"0.1.3"
+  }
+]

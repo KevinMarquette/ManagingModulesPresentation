@@ -1,0 +1,18 @@
+{
+    "Modules":[
+        {
+            "Name":"Pester",
+            "RequiredVersion":"4.3.1"
+        },
+        {
+            "Name":"PSScriptAnalyzer"
+        },
+        {
+            "Name":"Plaster"
+        }
+    ],
+    "TestOrder":[
+        "MyProject1",
+        "MyProject2"
+    ]
+}

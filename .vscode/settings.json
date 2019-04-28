@@ -7,5 +7,6 @@
         "statusBar.background": "#b1a8b2",
         "statusBarItem.hoverBackground": "#998d9a",
         "statusBar.foreground": "#15202b"
-    }
+    },
+    "terminal.integrated.rendererType": "dom"
 }
