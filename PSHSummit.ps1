@@ -1,26 +1,4 @@
-#region Demo Prep, you saw nothing
-# 
-# clear custom prompt and exit early
-function prompt { '#PHSSummit:\>' }
-
-$networkShare = '.\FileShare'
-$apikey = Get-Content -Path API.key 
-$ENV:nugetapikey = $apikey
-$configPath = ".\UpdateModule\communityModules.json"
-
-Clear-Host
-
-# Need adminrights for docker
-$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
-{
-    Write-Host "Restart Demo as Administrator (for Docker)" -BackgroundColor Red -ForegroundColor Black 
-    Pause
-}
-
-break; # F5 protection
-
-#endregion
+                                                                                           break; # F5 protection, you saw nothing
 #region    Basic Repository Creation and Publishing 
 # 
 # Create our first repository
@@ -96,13 +74,16 @@ VERBOSE: Searching repository 'C:\workspace\ManagingModulesPresentation\FileShar
 VERBOSE: Total package yield:'0' for the specified package ''.
 #>
 
+# Demo module
 Get-ChildItem '.\MyModule'
+
 
 $publishModuleSplat = @{
     Repository = 'MyRepository'
     Path       = '.\MyModule'
 }
 Publish-Module @publishModuleSplat
+
 
 
 Find-Module -Repository 'MyRepository'
@@ -113,8 +94,8 @@ Version Name       Repository   Description
 #>
 
 $installModuleSplat = @{
-    Name       = 'MyModule'
     Repository = 'MyRepository'
+    Name       = 'MyModule'
     Scope      = 'CurrentUser'
     Force      = $true
 }
@@ -152,11 +133,12 @@ $publishModuleSplat = @{
 }
 Publish-Module @publishModuleSplat
 
+
 Find-Module -Repository 'MyRepository'
 <# Output 
 Version Name          Repository   Description
 ------- ----          ----------   -----------
-0.1.0   MyModule      MyRepository Fake module
+0.1.4   MyModule      MyRepository Fake module
 0.1.3   Watch-Command MyRepository A function to run a command over and over so you can watch the results
 #>
 
@@ -185,6 +167,11 @@ At C:\Users\kmarquette\Documents\WindowsPowerShell\Modules\PowerShellGet
 \2.1.2\PSModule.psm1:9349 char:21
 #>
 
+# Set default parameter values 
+$PSDefaultParameterValues["Find-Module:Repository"] = 'MyRepository'
+$PSDefaultParameterValues["Install-Module:Repository"] = 'MyRepository'
+$PSDefaultParameterValues["Install-Module:Scope"] = 'CurrentUser'
+
 
 #endregion
 #region    Using a NuGet Feed 
@@ -197,8 +184,6 @@ At C:\Users\kmarquette\Documents\WindowsPowerShell\Modules\PowerShellGet
 
 
 # We will need an api key
-# $apiKey = New-Guid
-# Set-Content -Path API.key -Value $apikey 
 $apikey = Get-Content -Path API.key 
 $apikey
 
@@ -287,6 +272,12 @@ Step-ModuleVersion -Path '.\MyModule\MyModule.psd1'
 
 $modulePath = '.\MyModule'
 $myRepository = 'MyRepository'
+
+"Files in module output:"
+Get-ChildItem $modulePath -Recurse -File |
+    Select-Object -Expand FullName
+
+"Publishing [$modulePath] to [$myRepository]"
 $publishModuleSplat = @{
     Path        = $modulePath
     NuGetApiKey = $ENV:nugetapikey
@@ -295,13 +286,6 @@ $publishModuleSplat = @{
     Repository  = $myRepository
     ErrorAction = 'Stop'
 }
-
-"Files in module output:"
-Get-ChildItem $publishModuleSplat.Path -Recurse -File |
-    Select-Object -Expand FullName
-
-"Publishing [$modulePath] to [$myRepository]"
-
 Publish-Module @publishModuleSplat
 
 
@@ -573,7 +557,7 @@ $privateModuleList = Find-Module @findModuleSplat
 
 
 # Specified modules?
-code.cmd '.\UpdateModule\modules.json'
+code '.\UpdateModule\modules.json'
 $moduleListPath = '.\UpdateModule\modules.json'
 $publicModuleList = (Get-Content -Path $moduleListPath -Raw |
         ConvertFrom-Json) |
@@ -673,10 +657,11 @@ True     True     String System.Object
 #region    Updating AZ Module 
 
 # Fixed in PowerShell 6.2, Broken in 5.1
+# Start .\replay\az.gif
 Get-Module AZ -ListAvailable
 Get-Module AZ* -ListAvailable
 
-
+# !! cut for time
 code .\UpdateModule\Update-LDAZModule.ps1
 
 #endregion

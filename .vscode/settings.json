@@ -8,5 +8,7 @@
         "statusBarItem.hoverBackground": "#998d9a",
         "statusBar.foreground": "#15202b"
     },
-    "terminal.integrated.rendererType": "dom"
+    "terminal.integrated.rendererType": "dom",
+    "workbench.colorTheme": "PowerShell ISE",
+    "window.zoomLevel": 3
 }
