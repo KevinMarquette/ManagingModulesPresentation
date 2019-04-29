@@ -7,7 +7,7 @@
   },
   {
     "Name":"jira",
-    "Repository":"PSGallery",
+    "Repository":"MyRepository",
     "MaximumVersion":"0.99.99",
     "MinimumVersion":"0.3.2"
   },

@@ -168,9 +168,9 @@ At C:\Users\kmarquette\Documents\WindowsPowerShell\Modules\PowerShellGet
 #>
 
 # Set default parameter values 
-$PSDefaultParameterValues["Find-Module:Repository"] = 'MyRepository'
+$PSDefaultParameterValues["Find-Module:Repository"]    = 'MyRepository'
 $PSDefaultParameterValues["Install-Module:Repository"] = 'MyRepository'
-$PSDefaultParameterValues["Install-Module:Scope"] = 'CurrentUser'
+$PSDefaultParameterValues["Install-Module:Scope"]      = 'CurrentUser'
 
 
 #endregion
@@ -187,6 +187,7 @@ $PSDefaultParameterValues["Install-Module:Scope"] = 'CurrentUser'
 $apikey = Get-Content -Path API.key 
 $apikey
 
+
 $arguments = @(
     'run'
     '--detach=true'
@@ -198,15 +199,16 @@ $arguments = @(
 Start-Process Docker -ArgumentList $arguments -Wait -NoNewWindow
 
 # Remove container if already exists (save the demo)
-# docker.exe kill nuget-server
-# docker.exe rm nuget-server
+# docker.exe kill nuget-server; docker.exe rm nuget-server
+
+
+#Verify we are live
+$uri = 'http://localhost:5000'
+Invoke-WebRequest $uri | Format-Table Status*
 
 
 <# Register the Repository #>
 
-Import-Module PowerShellGet
-
-$uri = 'http://localhost:5000'
 $repo = @{
     Name               = 'MyNuGetRepository'
     SourceLocation     = $uri
@@ -248,8 +250,8 @@ $publishModuleSplat = @{
 Publish-Module @publishModuleSplat
 
 
-
 Find-Module -Repository 'MyNuGetRepository'
+
 <# output
 Version Name          Repository        Description
 ------- ----          ----------        -----------
@@ -259,7 +261,7 @@ Version Name          Repository        Description
 Find-Module -Repository 'MyNuGetRepository' | 
     Install-Module -Force
 
-
+Get-Module 'Watch-Command' -ListaAvailable
 
 #endregion
 #region    Publish Module Scripts 
@@ -299,7 +301,7 @@ $file = Get-ChildItem '.\MyModule\MyModule.psd1'
 Test-ModuleManifest -Path $file.fullname -Verbose
 
 # Verify you can import the module
-Remove-Module -name $file.basename -Force -ErrorAction Ignore
+Remove-Module -Name $file.basename -Force -ErrorAction Ignore
 Import-Module -Force -Name $file.DirectoryName
 
 
@@ -326,7 +328,6 @@ $find = @{
     Repository = 'MyRepository'
     RequiredVersion = $manifest.ModuleVersion
 }
-
 try {
     Find-Module @find -ErrorAction Stop
 } catch {
@@ -339,33 +340,6 @@ if ( [string]::IsNullOrEmpty( $ENV:nugetapikey))
 {
     Write-Error "[nugetapikey] is not defined" -ErrorAction Stop
 }
-
-# Watch out for too many module on system
-# issue on Server 2012R2, fixed in PowerShell 6
-# ugly hack incomming
-
-$manifest = Invoke-Expression (Get-Content $file.FullName -raw)
-
-'Create module cache'
-$savePSModulePath = $ENV:PSModulePath
-New-Item -Path 'ModuleCache' -ItemType Directory -ErrorAction Ignore
-$ENV:PSModulePath = Resolve-Path ModuleCache
-
-"Downloading dependent modules"
-foreach ($requiredModule in $manifest.RequiredModules){
-    "[$requiredModule]"
-    $saveModuleSplat = @{
-        Name       = $requiredModule
-        Path       = $ENV:PSModulePath
-        Verbose    = $true
-        Repository = $RepositoryName
-    }
-    Save-Module @saveModuleSplat
-}
-
-Publish-Module @publishModuleSplat
-
-# For binary modules, consider doing the publish in Start-Job
 
 #endregion
 #region    Hosting public modules internally
@@ -440,26 +414,6 @@ Version Name             Repository   Description
 
 
 
-# Ensure Session PSModulePath has user module path.
-$env:PSModulePath -split ';'
-
-if ( $PSVersionTable.PSEdition -ne 'Core')
-{
-    $env:PSModulePath = ( 
-        @( 
-            "$env:USERPROFILE\Documents\WindowsPowerShell\Modules"
-            ($env:PSModulePath -split ";")
-            
-        ) | Select-Object -Unique 
-    ) -join ";"
-
-    Write-Verbose "Ensuring User-Level Module Path Exists"
-    [Environment]::SetEnvironmentVariable(
-        "PSModulePath", $env:PSModulePath, "User"
-    )
-}
-
-
 
 <#
     As administrator
@@ -497,7 +451,7 @@ Start-Job -ScriptBlock {
         Sort-Object Version -Descending | 
         Select-Object -First 1
 
-    if ($PowerShellGet.Version -lt [version]'1.6.0')
+    if ($PowerShellGet.Version -lt [version]'2.1.2')
     {
         "Updating [PowerShellGet]"
 
@@ -563,7 +517,6 @@ $publicModuleList = (Get-Content -Path $moduleListPath -Raw |
         ConvertFrom-Json) |
     Find-Module
 
-# or a little bit of both?
 $allModules = @($privateModuleList) + $publicModuleList
 
 
@@ -637,7 +590,7 @@ elseif (
 
 # Watch those verison types
 Get-Module 'Watch-Command' -ListAvailable -OutVariable local
-Find-Module 'Watch-Command' -Repository 'PSGallery' -OutVariable gallery
+Find-Module 'Watch-Command' -Repository 'MyRepository' -OutVariable gallery
 $local.Version.GetType()
 $gallery.Version.GetType()
 
