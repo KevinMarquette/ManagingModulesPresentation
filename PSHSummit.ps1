@@ -1,18 +1,14 @@
                                                                                            break; # F5 protection, you saw nothing
 #region    #1 Basic Repository Creation and Publishing 
-# 
+# 5-13
 # Create our first repository
 
-# Update PackageManagement and PowerShellGet
-$installOptions = @{
-    Scope         = 'CurrentUser'
-    Repository    = 'PSGallery'
-    AcceptLicense = $true
-    AllowClobber  = $true
-}
-Install-Module -Name 'PackageManagement' @installOptions -Force
-Install-Module -Name 'PowerShellGet' @installOptions
+
+
+
 Import-Module 'PowerShellGet'
+
+
 
 Get-Command -Module PowerShellGet *PSRepository*
 <# Output
@@ -56,6 +52,7 @@ $repo = @{
 }
 Register-PSRepository @repo
 
+
 Get-PSRepository -Name 'MyRepository'
 <# Output
 Name                      InstallationPolicy   SourceLocation
@@ -74,7 +71,7 @@ VERBOSE: Searching repository 'C:\workspace\ManagingModulesPresentation\FileShar
 VERBOSE: Total package yield:'0' for the specified package ''.
 #>
 
-# Demo module
+# Publish a Demo module
 Get-ChildItem '.\MyModule'
 
 
@@ -175,7 +172,7 @@ $PSDefaultParameterValues["Install-Module:Scope"]      = 'CurrentUser'
 
 #endregion
 #region    #2 Using a NuGet Feed 
-#
+# 13-18
 # Repository as a service
 
 
@@ -261,12 +258,12 @@ Version Name          Repository        Description
 Find-Module -Repository 'MyNuGetRepository' | 
     Install-Module -Force
 
-Get-Module 'Watch-Command' -ListaAvailable
+Get-Module 'Watch-Command' -ListAvailable
 
 #endregion
 #region    #3 Publish Module Scripts 
-
-
+# 18-24
+# Tooling to make it happen
 
 <# Basic publish script #>
 Step-ModuleVersion -Path '.\MyModule\MyModule.psd1'
@@ -300,6 +297,7 @@ $file = Get-ChildItem '.\MyModule\MyModule.psd1'
 # Use Test-ModuleManifest to pre-validate
 Test-ModuleManifest -Path $file.fullname -Verbose
 
+
 # Verify you can import the module
 Remove-Module -Name $file.basename -Force -ErrorAction Ignore
 Import-Module -Force -Name $file.DirectoryName
@@ -331,7 +329,7 @@ $find = @{
 try {
     Find-Module @find -ErrorAction Stop
 } catch {
-    Write-Error "Newer version of module did not publish" -Verbose
+    Write-Error "Newer version of module did not publish" -Verbose 
 }
 
 
@@ -343,6 +341,7 @@ if ( [string]::IsNullOrEmpty( $ENV:nugetapikey))
 
 #endregion
 #region    #4 Hosting public modules internally
+# 24-28
 Start .\replay\republish.gif
 
 # Create download folder
@@ -409,8 +408,8 @@ Version Name             Repository   Description
 
 #endregion
 #region    #5 System Bootstrapping 
-
-
+# 28-34
+# In the beginning there was 1.0.0.1
 
 
 
@@ -495,10 +494,10 @@ Update-MyModule -Verbose
 
 #endregion
 #region    #6 Tips for Update-MyModule 
-
-
-
+# 34-40
 # What modules to update/install?
+
+
 
 # Everything from internal repo?
 $findModuleSplat = @{
@@ -608,13 +607,15 @@ True     True     String System.Object
 
 #endregion
 #region    #7 Updating AZ Module 
+# 40-43, cut for time
+# Does not play by the rules
+
 
 # Fixed in PowerShell 6.2, Broken in 5.1
 # Start .\replay\az.gif
 Get-Module AZ -ListAvailable
 Get-Module AZ* -ListAvailable
 
-# !! cut for time
 code .\UpdateModule\Update-LDAZModule.ps1
 
 #endregion

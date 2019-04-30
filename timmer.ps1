@@ -1,6 +1,5 @@
 $settingsPath = '.\.vscode\settings.json'
-$startTime = [datetime]"2019/04/28 10:20:00AM"
-$startTime = Get-Date
+$startTime = [datetime]"2019/04/30 4:15:00PM"
 
 $ColorMap = @(
     @{
@@ -26,7 +25,7 @@ $ColorMap = @(
     @{
         Name = "Basic Repository Creation and Publishing: Half way done"
         Time = $startTime.AddMinutes(8)
-        Color = "#AAAAFF"
+        Color = "#6666FF"
     },
     @{
         Name = "Basic Repository Creation and Publishing: Finish"
@@ -49,23 +48,18 @@ $ColorMap = @(
         Color = "#AA66AA"
     },
     @{
-        Name = "#3 Publish Module Scripts: Halfway"
-        Time = $startTime.AddMinutes(21)
-        Color = "#FF66FF"
-    },
-    @{
         Name = "#3 Publish Module Scripts: Finish"
         Time = $startTime.AddMinutes(23)
         Color = "#FFDDFF"
     },
     @{
-        Name = "#4 Publish Module Scripts"
+        Name = "#4 Hosting public modules internally"
         Time = $startTime.AddMinutes(24)
         Color = "#99FF99"
     },
     @{
-        Name = "#4 Publish Module Scripts"
-        Time = $startTime.AddMinutes(24)
+        Name = "#4 Hosting public modules internally: Finish"
+        Time = $startTime.AddMinutes(27)
         Color = "#DDFFDD"
     },
     @{
@@ -75,7 +69,7 @@ $ColorMap = @(
     },
     @{
         Name = "#5 System Bootstrapping: Finished"
-        Time = $startTime.AddMinutes(34)
+        Time = $startTime.AddMinutes(33)
         Color = "#FFFF99"
     },
     @{
@@ -105,7 +99,8 @@ while($true)
     $settings = Get-Content $settingsPath | 
         ConvertFrom-JSON
     $color = $ColorMap[$index].Color
-    Write-Host ('[{0}] {1:HH:mm:ss} {2}' -f $color, (Get-Date),   $ColorMap[$index].Name)
+    Write-Host ''
+    Write-Host ('[{0}] {1:HH:mm:ss} {2}' -f $color, (Get-Date),   $ColorMap[$index].Name) -NoNewline
     $settings.'workbench.colorCustomizations'.'statusBar.background' = $color
     $settings.'workbench.colorCustomizations'.'titleBar.activeBackground' = $color
     $settings.'workbench.colorCustomizations'.'titleBar.inactiveBackground' = $color
@@ -115,7 +110,8 @@ while($true)
     if($ColorMap[$index + 1].Time -le (Get-Date))
     {
         $index++        
-        Write-Host ("  [{0}] Next Index [{1}]" -f $ColorMap[$index].Time, $index)
+        Write-Host ''
+        Write-Host ("  [{0}] Next Index [{1}]" -f $ColorMap[$index].Time, $index) -NoNewline
     }
     if($index -ge $ColorMap.Length)
     {
