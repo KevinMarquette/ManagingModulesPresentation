@@ -1,5 +1,5 @@
                                                                                            break; # F5 protection, you saw nothing
-#region    Basic Repository Creation and Publishing 
+#region    #1 Basic Repository Creation and Publishing 
 # 
 # Create our first repository
 
@@ -174,7 +174,7 @@ $PSDefaultParameterValues["Install-Module:Scope"]      = 'CurrentUser'
 
 
 #endregion
-#region    Using a NuGet Feed 
+#region    #2 Using a NuGet Feed 
 #
 # Repository as a service
 
@@ -264,7 +264,7 @@ Find-Module -Repository 'MyNuGetRepository' |
 Get-Module 'Watch-Command' -ListaAvailable
 
 #endregion
-#region    Publish Module Scripts 
+#region    #3 Publish Module Scripts 
 
 
 
@@ -342,7 +342,7 @@ if ( [string]::IsNullOrEmpty( $ENV:nugetapikey))
 }
 
 #endregion
-#region    Hosting public modules internally
+#region    #4 Hosting public modules internally
 Start .\replay\republish.gif
 
 # Create download folder
@@ -408,7 +408,7 @@ Version Name             Repository   Description
 #>
 
 #endregion
-#region    System Bootstrapping 
+#region    #5 System Bootstrapping 
 
 
 
@@ -494,7 +494,7 @@ Update-MyModule -Verbose
 # Start .\replay\UpdateModule.gif
 
 #endregion
-#region    Tips for Update-MyModule 
+#region    #6 Tips for Update-MyModule 
 
 
 
@@ -607,7 +607,7 @@ True     True     String System.Object
 
 
 #endregion
-#region    Updating AZ Module 
+#region    #7 Updating AZ Module 
 
 # Fixed in PowerShell 6.2, Broken in 5.1
 # Start .\replay\az.gif
