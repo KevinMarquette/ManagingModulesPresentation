@@ -114,7 +114,35 @@ Mode                LastWriteTime         Length Name
 -a----         1/14/2019 10:17 PM           5941 MyModule.0.1.0.nupkg
 #>
 
-# publish a locally installed module
+
+# RequiredModules = @('VsoLoggingCommands')
+# ExternalModuleDependencies
+code .\MyModule2\MyModule2.psd1
+
+
+
+$publishModuleSplat = @{
+    Repository = 'MyRepository'
+    Path       = '.\MyModule2'
+}
+Publish-Module @publishModuleSplat -Verbose -Force
+
+# Use ExternalModuleDependencies
+
+
+
+Find-Module -Repository 'MyRepository'
+<# Output 
+Version Name          Repository   Description
+------- ----          ----------   -----------
+0.1.0   MyModule      MyRepository Fake module
+0.1.0   MyModule2     MyRepository A function to run a command over and over so you can watch the results
+#>
+
+
+
+
+# Quickly publish a locally installed module
 Get-Module -Name 'Watch-Command' -ListAvailable
 <# Output
 ModuleType Version Name          PSEdition ExportedCommands
@@ -132,13 +160,6 @@ Publish-Module @publishModuleSplat
 
 
 Find-Module -Repository 'MyRepository'
-<# Output 
-Version Name          Repository   Description
-------- ----          ----------   -----------
-0.1.4   MyModule      MyRepository Fake module
-0.1.3   Watch-Command MyRepository A function to run a command over and over so you can watch the results
-#>
-
 
 # Always specify repository
 # #340 Allow multiple repositories to contain the same package
@@ -607,7 +628,7 @@ True     True     String System.Object
 
 #endregion
 #region    #7 Updating AZ Module 
-# 40-43, cut for time
+# 40-43, cut for time if needed
 # Does not play by the rules
 
 

@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'MyModule.psm1'
+RootModule = 'MyModule2.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.1.0'
@@ -18,7 +18,7 @@ ModuleVersion = '0.1.0'
 # CompatiblePSEditions = @()
 
 # ID used to uniquely identify this module
-GUID = '5d2ef068-45d4-49a4-bcd8-53da4ed618a4'
+GUID = '6d2ef068-45d4-49a4-bcd8-53da4ed618a4'
 
 # Author of this module
 Author = 'Kevin Marquette'
@@ -30,7 +30,7 @@ CompanyName = 'PowerShellExplained.com'
 Copyright = '(c) 2019 Kevin Marquette. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Fake module'
+Description = 'Module with Dependency'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -51,7 +51,7 @@ Description = 'Fake module'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-#RequiredModules = @()
+RequiredModules = @('VsoLoggingCommands')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -110,6 +110,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         # ReleaseNotes = ''
+        #ExternalModuleDependencies = @('VsoLoggingCommands')
 
     } # End of PSData hashtable
 
@@ -122,8 +123,6 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
-
-
 
 
 
