@@ -1,14 +1,16 @@
+#demo prep
 Remove-Module posh-git -ErrorAction Ignore
 function prompt {"#PSHSummit\>"}
-# Remove loanDepot repository
-# Unregister-PSRepository DevOpsPowerShell
 
-.\Cleanup.ps1
+.\Cleanup.ps1 -Docker
 
 $apiKey = New-Guid
+$ENV:nugetapikey = $apiKey
 Set-Content -Path API.key -Value $apikey 
 
-. "C:\Program Files\Microsoft Office\root\Office16\POWERPNT.EXE" /s  .\ManagingModulesPresentation.pptx
+Clear-Host
+
+. '.\Summit 2022.pptx'
 code .\PSHSummit.ps1
 
 break;

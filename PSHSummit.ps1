@@ -5,11 +5,11 @@
 
 
 
-
+# Load commands
 Import-Module 'PowerShellGet'
 
 
-
+# Show Commands
 Get-Command -Module PowerShellGet *PSRepository*
 <# Output
 CommandType Name                    Version Source
@@ -28,9 +28,10 @@ PSGallery Untrusted          https://www.powershellgallery.com/api/v2
 #>
 
 
+
 <# Using Register-PSRepository #>
 
-# Works with UNC shares
+# Works with UNC shares (using local for demo)
 $networkShare = '.\FileShare'
 
 # Create the folder for the demo
@@ -38,6 +39,8 @@ if ( -not (Test-Path -Path $networkShare))
 {
     New-Item -Path $networkShare -ItemType Directory
 }
+
+
 
 # #464 Need to resolve the full path
 # Issue https://github.com/PowerShell/PowerShellGet/issues/464
@@ -53,6 +56,7 @@ $repo = @{
 Register-PSRepository @repo
 
 
+# Show new repository
 Get-PSRepository -Name 'MyRepository'
 <# Output
 Name                      InstallationPolicy   SourceLocation
@@ -105,18 +109,17 @@ Get-Module MyModule -ListAvailable
 Get-Something
 
 
-# Contents of share
+# Show contents of share
 Get-ChildItem -Path $networkShare
 <# Output
 Directory: C:\workspace\ManagingModulesPresentation\FileShare
 Mode                LastWriteTime         Length Name
 ----                -------------         ------ ----
--a----         1/14/2019 10:17 PM           5941 MyModule.0.1.0.nupkg
+-a----         1/14/2022 10:17 PM           5941 MyModule.0.1.0.nupkg
 #>
 
 
-# RequiredModules = @('VsoLoggingCommands')
-# ExternalModuleDependencies
+# Using RequiredModules = @('VsoLoggingCommands')
 code .\MyModule2\MyModule2.psd1
 
 
@@ -126,8 +129,17 @@ $publishModuleSplat = @{
     Path       = '.\MyModule2'
 }
 Publish-Module @publishModuleSplat -Verbose -Force
+<# Output
+Publish-PSArtifactUtility: PowerShellGet cannot resolve the module dependency 
+'VsoLoggingCommands' of the module 'MyModule2' on the repository 'MyRepository'. 
+Verify that the dependent module 'VsoLoggingCommands' is available in the repository
+'MyRepository'. If this dependent module 'VsoLoggingCommands' is managed      
+externally, add it to the ExternalModuleDependencies entry in the PSData      
+section of the module manifest.
+#>
 
-# Use ExternalModuleDependencies
+
+# Fix With ExternalModuleDependencies = @('VsoLoggingCommands')
 
 
 
@@ -161,6 +173,9 @@ Publish-Module @publishModuleSplat
 
 Find-Module -Repository 'MyRepository'
 
+
+
+
 # Always specify repository
 # #340 Allow multiple repositories to contain the same package
 # https://github.com/PowerShell/PowerShellGet/issues/340
@@ -185,6 +200,8 @@ At C:\Users\kmarquette\Documents\WindowsPowerShell\Modules\PowerShellGet
 \2.1.2\PSModule.psm1:9349 char:21
 #>
 
+
+
 # Set default parameter values 
 $PSDefaultParameterValues["Find-Module:Repository"]    = 'MyRepository'
 $PSDefaultParameterValues["Install-Module:Repository"] = 'MyRepository'
@@ -195,7 +212,7 @@ $PSDefaultParameterValues["Install-Module:Scope"]      = 'CurrentUser'
 #region    #2 Using a NuGet Feed 
 # 13-18
 # Repository as a service
-
+# https://cloudsmith.com/
 
 
 
@@ -223,6 +240,7 @@ Start-Process Docker -ArgumentList $arguments -Wait -NoNewWindow
 #Verify we are live
 $uri = 'http://localhost:5000'
 Invoke-WebRequest $uri | Format-Table Status*
+
 
 
 <# Register the Repository #>
@@ -282,11 +300,15 @@ Find-Module -Repository 'MyNuGetRepository' |
 Get-Module 'Watch-Command' -ListAvailable
 
 #endregion
+
+
+
 #region    #3 Publish Module Scripts 
 # 18-24
 # Tooling to make it happen
 
 <# Basic publish script #>
+# from BuildHelpers module
 Step-ModuleVersion -Path '.\MyModule\MyModule.psd1'
 # code .\updatemodule\publishsimple.ps1 
 
@@ -319,13 +341,16 @@ $file = Get-ChildItem '.\MyModule\MyModule.psd1'
 Test-ModuleManifest -Path $file.fullname -Verbose
 
 
+
 # Verify you can import the module
 Remove-Module -Name $file.basename -Force -ErrorAction Ignore
 Import-Module -Force -Name $file.DirectoryName
 
 
+
 # Publish the folder, not the psd1
-# #85 Publish-Module with -Path requires directory and cannot use path to manifest file (*.psd1) 
+# #85 Publish-Module with -Path requires directory and 
+#     cannot use path to manifest file (*.psd1) 
 # https://github.com/PowerShell/PowerShellGet/issues/85
 Step-ModuleVersion -Path $file.FullName
 $publishOptions = @{
@@ -341,6 +366,7 @@ Publish-Module -Path $file.DirectoryName @publishOptions
 # Resolved: #316 Publish-Module doesn't report error but fails to publish module
 # https://github.com/PowerShell/PowerShellGet/issues/316
 $manifest = Invoke-Expression (Get-Content $file.FullName -raw)
+$manifest
 
 $find = @{
     Name       = 'MyModule'
@@ -354,6 +380,7 @@ try {
 }
 
 
+
 # Verify the API key is not blank
 if ( [string]::IsNullOrEmpty( $ENV:nugetapikey))
 {
@@ -361,6 +388,9 @@ if ( [string]::IsNullOrEmpty( $ENV:nugetapikey))
 }
 
 #endregion
+
+
+
 #region    #4 Hosting public modules internally
 # 24-28
 Start .\replay\republish.gif
@@ -450,7 +480,7 @@ Write-Verbose "Registering PSRepository [$repository] for with [$uri]" -Verbose
 Start-Job -ScriptBlock {
     if ( -Not ( Get-PSRepository -Name $using:repository -ErrorAction Ignore ) )
     {
-        "  Installing Nuget PackageProvider"
+        "Installing Nuget PackageProvider"
         $PackageProvider = @{
             Name           = 'NuGet'
             Force          = $true
@@ -458,6 +488,7 @@ Start-Job -ScriptBlock {
         }
         $null = Install-PackageProvider @PackageProvider
 
+        "Registering repository [$using:repository]"
         $PSRepository = @{
             Name               = $using:repository
             SourceLocation     = $using:uri
@@ -467,11 +498,11 @@ Start-Job -ScriptBlock {
         Register-PSRepository @PSRepository
     }
 
-    $PowerShellGet = Get-Module PowerShellGet -ListAvailable | 
+    $PowerShellGet = Get-Module 'PowerShellGet' -ListAvailable | 
         Sort-Object Version -Descending | 
         Select-Object -First 1
 
-    if ($PowerShellGet.Version -lt [version]'2.1.2')
+    if ($PowerShellGet.Version -lt [version]'2.2.5')
     {
         "Updating [PowerShellGet]"
 
@@ -487,6 +518,8 @@ Start-Job -ScriptBlock {
     }
 } | Wait-Job | Receive-Job
 
+
+
 <#
     Offline/Manual package provider install
     copy files from existing system
@@ -495,6 +528,7 @@ Start-Job -ScriptBlock {
 "$env:ProgramFiles\Program Files\PackageManagement\ProviderAssemblies"
 "$env:LocalAppData\PackageManagement\ProviderAssemblies"
 Import-PackageProvider -Name NuGet -RequiredVersion 2.8.5.201
+
 
 
 <#
@@ -540,6 +574,7 @@ $publicModuleList = (Get-Content -Path $moduleListPath -Raw |
 $allModules = @($privateModuleList) + $publicModuleList
 
 
+
 <#
     Only update modules that need it
     Update-Module vs Install-Module
@@ -573,8 +608,11 @@ foreach ( $module in $allModules )
     }
 }
 
-# Not all versions are the same
 
+
+# Not all versions are the same
+#  NuGet pack ignores nuspec versions
+#  https://github.com/NuGet/Home/issues/3050
 Find-Module SqlServerDsc 
 
 <# Output Start .\replay\FindModuleVersion.gif
@@ -585,7 +623,7 @@ Version  Name         Repository       Description
 #>
 
 [version]$version = '12.4.0.0'
-[version]$target = '12.4.0 '
+[version]$target = '12.4.0'
 
 $version -eq $target
 $version, $target 
@@ -611,8 +649,8 @@ elseif (
 # Watch those verison types
 Get-Module 'Watch-Command' -ListAvailable -OutVariable local
 Find-Module 'Watch-Command' -Repository 'MyRepository' -OutVariable gallery
-$local.Version.GetType()
-$gallery.Version.GetType()
+$local.Version.GetType()    #-> [Version]
+$gallery.Version.GetType()  #-> [String]
 
 <# Output start .\replay\VersionTypes.gif
 IsPublic IsSerial Name    BaseType
